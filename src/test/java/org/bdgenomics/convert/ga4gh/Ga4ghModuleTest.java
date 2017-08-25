@@ -54,6 +54,7 @@ public final class Ga4ghModuleTest {
     public void testGa4ghModule() {
         Injector injector = Guice.createInjector(module, new BdgenomicsModule(), new TestModule());
         Target target = injector.getInstance(Target.class);
+        assertNotNull(target.getBdgenomicsFeatureToGa4ghFeature());
         assertNotNull(target.getBdgenomicsOntologyTermToGa4ghOntologyTerm());
         assertNotNull(target.getFeatureTypeToOntologyTerm());
         assertNotNull(target.getGa4ghOntologyTermToBdgenomicsOntologyTerm());
@@ -65,6 +66,7 @@ public final class Ga4ghModuleTest {
      * Injection target.
      */
     static class Target {
+        Converter<org.bdgenomics.formats.avro.Feature, ga4gh.SequenceAnnotations.Feature> bdgenomicsFeatureToGa4ghFeature;
         Converter<org.bdgenomics.formats.avro.OntologyTerm, ga4gh.Common.OntologyTerm> bdgenomicsOntologyTermToGa4ghOntologyTerm;
         Converter<ga4gh.Common.OntologyTerm, org.bdgenomics.formats.avro.OntologyTerm> ga4ghOntologyTermToBdgenomicsOntologyTerm;
         Converter<org.bdgenomics.formats.avro.Strand, ga4gh.Common.Strand> bdgenomicsStrandToGa4ghStrand;
@@ -72,16 +74,22 @@ public final class Ga4ghModuleTest {
         Converter<ga4gh.Common.Strand, org.bdgenomics.formats.avro.Strand> ga4ghStrandToBdgenomicsStrand;
 
         @Inject
-        Target(final Converter<org.bdgenomics.formats.avro.OntologyTerm, ga4gh.Common.OntologyTerm> bdgenomicsOntologyTermToGa4ghOntologyTerm,
+        Target(final Converter<org.bdgenomics.formats.avro.Feature, ga4gh.SequenceAnnotations.Feature> bdgenomicsFeatureToGa4ghFeature,
+               final Converter<org.bdgenomics.formats.avro.OntologyTerm, ga4gh.Common.OntologyTerm> bdgenomicsOntologyTermToGa4ghOntologyTerm,
                final Converter<String, ga4gh.Common.OntologyTerm> featureTypeToOntologyTerm,
                final Converter<ga4gh.Common.OntologyTerm, org.bdgenomics.formats.avro.OntologyTerm> ga4ghOntologyTermToBdgenomicsOntologyTerm,
                final Converter<org.bdgenomics.formats.avro.Strand, ga4gh.Common.Strand> bdgenomicsStrandToGa4ghStrand,
                final Converter<ga4gh.Common.Strand, org.bdgenomics.formats.avro.Strand> ga4ghStrandToBdgenomicsStrand) {
+            this.bdgenomicsFeatureToGa4ghFeature = bdgenomicsFeatureToGa4ghFeature;
             this.bdgenomicsOntologyTermToGa4ghOntologyTerm = bdgenomicsOntologyTermToGa4ghOntologyTerm;
             this.featureTypeToOntologyTerm = featureTypeToOntologyTerm;
             this.ga4ghOntologyTermToBdgenomicsOntologyTerm = ga4ghOntologyTermToBdgenomicsOntologyTerm;
             this.bdgenomicsStrandToGa4ghStrand = bdgenomicsStrandToGa4ghStrand;
             this.ga4ghStrandToBdgenomicsStrand = ga4ghStrandToBdgenomicsStrand;
+        }
+
+        Converter<org.bdgenomics.formats.avro.Feature, ga4gh.SequenceAnnotations.Feature> getBdgenomicsFeatureToGa4ghFeature() {
+            return bdgenomicsFeatureToGa4ghFeature;
         }
 
         Converter<org.bdgenomics.formats.avro.OntologyTerm, ga4gh.Common.OntologyTerm> getBdgenomicsOntologyTermToGa4ghOntologyTerm() {
