@@ -37,10 +37,13 @@ public final class Ga4ghModule extends AbstractModule {
         // empty
     }
 
-    /*
     @Provides @Singleton
-    Converter<BedRecord, Feature> createBedRecordToFeature(final Converter<String, Strand> strandConverter) {
-        return new BedRecordToFeature(strandConverter);
+    Converter<ga4gh.Common.Strand, org.bdgenomics.formats.avro.Strand> createGa4ghStrandToBdgenomicsStrand() {
+        return new Ga4ghStrandToBdgenomicsStrand();
     }
-    */
+
+    @Provides @Singleton
+    Converter<org.bdgenomics.formats.avro.Strand, ga4gh.Common.Strand> createBdgenomicsStrandToGa4ghStrand() {
+        return new BdgenomicsStrandToGa4ghStrand();
+    }
 }

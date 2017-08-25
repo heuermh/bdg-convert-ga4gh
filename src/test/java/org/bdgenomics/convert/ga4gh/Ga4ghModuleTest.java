@@ -54,25 +54,31 @@ public final class Ga4ghModuleTest {
     public void testGa4ghModule() {
         Injector injector = Guice.createInjector(module, new BdgenomicsModule(), new TestModule());
         Target target = injector.getInstance(Target.class);
-        //assertNotNull(target.getBedRecordToFeature());
+        assertNotNull(target.getBdgenomicsStrandToGa4ghStrand());
+        assertNotNull(target.getGa4ghStrandToBdgenomicsStrand());
     }
 
     /**
      * Injection target.
      */
     static class Target {
-        //Converter<BedRecord, Feature> bedRecordToFeature;
+        Converter<org.bdgenomics.formats.avro.Strand, ga4gh.Common.Strand> bdgenomicsStrandToGa4ghStrand;
+        Converter<ga4gh.Common.Strand, org.bdgenomics.formats.avro.Strand> ga4ghStrandToBdgenomicsStrand;
 
         @Inject
-        Target() {//Converter<BedRecord, Feature> bedRecordToFeature,
-            //this.bedRecordToFeature = bedRecordToFeature;
+        Target(final Converter<org.bdgenomics.formats.avro.Strand, ga4gh.Common.Strand> bdgenomicsStrandToGa4ghStrand,
+               final Converter<ga4gh.Common.Strand, org.bdgenomics.formats.avro.Strand> ga4ghStrandToBdgenomicsStrand) {
+            this.bdgenomicsStrandToGa4ghStrand = bdgenomicsStrandToGa4ghStrand;
+            this.ga4ghStrandToBdgenomicsStrand = ga4ghStrandToBdgenomicsStrand;
         }
 
-        /*
-        Converter<BedRecord, Feature> getBedRecordToFeature() {
-            return bedRecordToFeature;
+        Converter<org.bdgenomics.formats.avro.Strand, ga4gh.Common.Strand> getBdgenomicsStrandToGa4ghStrand() {
+            return bdgenomicsStrandToGa4ghStrand;
         }
-        */
+
+        Converter<ga4gh.Common.Strand, org.bdgenomics.formats.avro.Strand> getGa4ghStrandToBdgenomicsStrand() {
+            return ga4ghStrandToBdgenomicsStrand;
+        }
     }
 
     /**
