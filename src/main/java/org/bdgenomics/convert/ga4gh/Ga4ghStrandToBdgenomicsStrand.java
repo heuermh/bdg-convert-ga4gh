@@ -55,6 +55,7 @@ final class Ga4ghStrandToBdgenomicsStrand extends AbstractConverter<ga4gh.Common
         else if (strand.equals(ga4gh.Common.Strand.NEG_STRAND)) {
             return org.bdgenomics.formats.avro.Strand.REVERSE;
         }
+        // note UNRECOGNIZED is no longer present on git head
         else if (strand.equals(ga4gh.Common.Strand.UNRECOGNIZED)) {
             return org.bdgenomics.formats.avro.Strand.INDEPENDENT;
         }

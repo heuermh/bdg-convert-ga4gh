@@ -46,4 +46,19 @@ public final class Ga4ghModule extends AbstractModule {
     Converter<org.bdgenomics.formats.avro.Strand, ga4gh.Common.Strand> createBdgenomicsStrandToGa4ghStrand() {
         return new BdgenomicsStrandToGa4ghStrand();
     }
+
+    @Provides @Singleton
+    Converter<ga4gh.Common.OntologyTerm, org.bdgenomics.formats.avro.OntologyTerm> createGa4ghOntologyTermToBdgenomicsOntologyTerm() {
+        return new Ga4ghOntologyTermToBdgenomicsOntologyTerm();
+    }
+
+    @Provides @Singleton
+    Converter<String, ga4gh.Common.OntologyTerm> createFeatureTypeToOntologyTerm() {
+        return new StringToOntologyTerm();
+    }
+
+    @Provides @Singleton
+    Converter<org.bdgenomics.formats.avro.OntologyTerm, ga4gh.Common.OntologyTerm> createBdgenomicsOntologyTermToGa4ghOntologyTerm() {
+        return new BdgenomicsOntologyTermToGa4ghOntologyTerm();
+    }
 }
