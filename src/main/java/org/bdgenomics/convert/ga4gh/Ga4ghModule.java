@@ -38,6 +38,11 @@ public final class Ga4ghModule extends AbstractModule {
     }
 
     @Provides @Singleton
+    Converter<org.bdgenomics.formats.avro.AlignmentRecord, ga4gh.Reads.ReadAlignment> createBdgenomicsAlignmentRecordToGa4ghReadAlignment() {
+        return new BdgenomicsAlignmentRecordToGa4ghReadAlignment();
+    }
+
+    @Provides @Singleton
     Converter<ga4gh.Common.Strand, org.bdgenomics.formats.avro.Strand> createGa4ghStrandToBdgenomicsStrand() {
         return new Ga4ghStrandToBdgenomicsStrand();
     }
