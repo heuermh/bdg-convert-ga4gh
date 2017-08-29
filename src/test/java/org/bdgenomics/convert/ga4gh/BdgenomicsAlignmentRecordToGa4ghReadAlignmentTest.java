@@ -120,6 +120,28 @@ public final class BdgenomicsAlignmentRecordToGa4ghReadAlignmentTest {
         List<Integer> temp = new ArrayList<Integer>(Arrays.asList(9, 9, 9, 9, 9, 9, 9, 9, 9, 9));
         assertEquals(temp, gaRead.getAlignedQualityList());
 
+    }
+
+    @Test
+    public void testJSON() {
+        org.bdgenomics.formats.avro.AlignmentRecord adamRead = makeRead(10L, "10M", "10", 10,0,false).build();
+
+        System.out.println("Here is adamRead: " + adamRead.toString());
+        System.out.println("Here is alignmentConverter: " + alignmentConverter.toString() + " conversion: " + ConversionStringency.STRICT.toString() + " logger: " + logger.toString());
+
+        ga4gh.Reads.ReadAlignment gaRead = alignmentConverter.convert(adamRead, ConversionStringency.STRICT, logger);
+
+        List<ga4gh.Reads.ReadAlignment> gaReads = new ArrayList<ga4gh.Reads.ReadAlignment>();
+        gaReads.add(gaRead);
+
+        ga4gh.ReadServiceOuterClass.SearchReadsResponse response = ga4gh.ReadServiceOuterClass.SearchReadsResponse.newBuilder().addAllAlignments(gaReads).build();
+
+        try {
+            String json = com.google.protobuf.util.JsonFormat.printer().print(response).replaceAll("\\s+","");
+            assertEquals("{\"alignments\":[{\"readGroupId\":\"rg1\",\"fragmentName\":\"read0\",\"numberReads\":2,\"fragmentLength\":200,\"alignment\":{\"position\":{\"referenceName\":\"myCtg\",\"position\":\"10\",\"strand\":\"POS_STRAND\"},\"mappingQuality\":60,\"cigar\":[{\"operation\":\"ALIGNMENT_MATCH\",\"operationLength\":\"10\"}]},\"alignedSequence\":\"AAAAAAAAAA\",\"alignedQuality\":[9,9,9,9,9,9,9,9,9,9],\"nextMatePosition\":{\"referenceName\":\"myCtg\",\"position\":\"100\",\"strand\":\"POS_STRAND\"}}]}", json);
+        } catch(com.google.protobuf.InvalidProtocolBufferException e) {
+            System.err.println("Error throws com.google.protobuf.InvalidProtocolBufferException");
+        }
 
     }
 
