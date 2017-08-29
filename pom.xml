@@ -25,6 +25,7 @@
     <htsjdk.version>2.9.1</htsjdk.version>
     <jsr305.version>3.0.1</jsr305.version>
     <junit.version>4.12</junit.version>
+    <protobuf.version>3.0.0-beta-3</protobuf.version>
     <slf4j.version>1.7.22</slf4j.version>
   </properties>
 
@@ -165,6 +166,16 @@
         <version>${guice.version}</version>
       </dependency>
       <dependency>
+        <groupId>com.google.protobuf</groupId>
+        <artifactId>protobuf-java</artifactId>
+        <version>${protobuf.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.google.protobuf</groupId>
+        <artifactId>protobuf-java-util</artifactId>
+        <version>${protobuf.version}</version>
+      </dependency>
+      <dependency>
         <groupId>org.ga4gh</groupId>
         <artifactId>ga4gh-schemas</artifactId>
         <version>${ga4gh.version}</version>
@@ -213,6 +224,16 @@
       <scope>compile</scope>
     </dependency>
     <dependency>
+      <groupId>com.google.protobuf</groupId>
+      <artifactId>protobuf-java</artifactId>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.google.protobuf</groupId>
+      <artifactId>protobuf-java-util</artifactId>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
       <groupId>org.ga4gh</groupId>
       <artifactId>ga4gh-schemas</artifactId>
       <scope>compile</scope>
@@ -242,17 +263,6 @@
       <artifactId>slf4j-simple</artifactId>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>com.google.protobuf</groupId>
-      <artifactId>protobuf-java</artifactId>
-      <version>3.0.0-beta-3</version>
-    </dependency>
-    <dependency>
-      <groupId>com.google.protobuf</groupId>
-      <artifactId>protobuf-java-util</artifactId>
-      <version>3.0.0-beta-3</version>
-    </dependency>
-
   </dependencies>
 
   <profiles>
