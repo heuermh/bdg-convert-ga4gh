@@ -60,6 +60,7 @@ public final class Ga4ghModuleTest {
         assertNotNull(target.getGa4ghOntologyTermToBdgenomicsOntologyTerm());
         assertNotNull(target.getBdgenomicsStrandToGa4ghStrand());
         assertNotNull(target.getGa4ghStrandToBdgenomicsStrand());
+        assertNotNull(target.getBdgenomicsAlignmentRecordToGa4ghReadAlignment());
     }
 
     /**
@@ -72,6 +73,7 @@ public final class Ga4ghModuleTest {
         Converter<org.bdgenomics.formats.avro.Strand, ga4gh.Common.Strand> bdgenomicsStrandToGa4ghStrand;
         Converter<String, ga4gh.Common.OntologyTerm> featureTypeToOntologyTerm;
         Converter<ga4gh.Common.Strand, org.bdgenomics.formats.avro.Strand> ga4ghStrandToBdgenomicsStrand;
+        Converter<org.bdgenomics.formats.avro.AlignmentRecord, ga4gh.Reads.ReadAlignment> bdgenomicsAlignmentRecordToGa4ghReadAlignment;
 
         @Inject
         Target(final Converter<org.bdgenomics.formats.avro.Feature, ga4gh.SequenceAnnotations.Feature> bdgenomicsFeatureToGa4ghFeature,
@@ -79,13 +81,15 @@ public final class Ga4ghModuleTest {
                final Converter<String, ga4gh.Common.OntologyTerm> featureTypeToOntologyTerm,
                final Converter<ga4gh.Common.OntologyTerm, org.bdgenomics.formats.avro.OntologyTerm> ga4ghOntologyTermToBdgenomicsOntologyTerm,
                final Converter<org.bdgenomics.formats.avro.Strand, ga4gh.Common.Strand> bdgenomicsStrandToGa4ghStrand,
-               final Converter<ga4gh.Common.Strand, org.bdgenomics.formats.avro.Strand> ga4ghStrandToBdgenomicsStrand) {
+               final Converter<ga4gh.Common.Strand, org.bdgenomics.formats.avro.Strand> ga4ghStrandToBdgenomicsStrand,
+               final Converter<org.bdgenomics.formats.avro.AlignmentRecord, ga4gh.Reads.ReadAlignment>bdgenomicsAlignmentRecordToGa4ghReadAlignment) {
             this.bdgenomicsFeatureToGa4ghFeature = bdgenomicsFeatureToGa4ghFeature;
             this.bdgenomicsOntologyTermToGa4ghOntologyTerm = bdgenomicsOntologyTermToGa4ghOntologyTerm;
             this.featureTypeToOntologyTerm = featureTypeToOntologyTerm;
             this.ga4ghOntologyTermToBdgenomicsOntologyTerm = ga4ghOntologyTermToBdgenomicsOntologyTerm;
             this.bdgenomicsStrandToGa4ghStrand = bdgenomicsStrandToGa4ghStrand;
             this.ga4ghStrandToBdgenomicsStrand = ga4ghStrandToBdgenomicsStrand;
+            this.bdgenomicsAlignmentRecordToGa4ghReadAlignment = bdgenomicsAlignmentRecordToGa4ghReadAlignment;
         }
 
         Converter<org.bdgenomics.formats.avro.Feature, ga4gh.SequenceAnnotations.Feature> getBdgenomicsFeatureToGa4ghFeature() {
@@ -110,6 +114,10 @@ public final class Ga4ghModuleTest {
 
         Converter<ga4gh.Common.Strand, org.bdgenomics.formats.avro.Strand> getGa4ghStrandToBdgenomicsStrand() {
             return ga4ghStrandToBdgenomicsStrand;
+        }
+
+        Converter<org.bdgenomics.formats.avro.AlignmentRecord, ga4gh.Reads.ReadAlignment> getBdgenomicsAlignmentRecordToGa4ghReadAlignment() {
+            return bdgenomicsAlignmentRecordToGa4ghReadAlignment;
         }
     }
 
