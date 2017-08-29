@@ -44,12 +44,12 @@ import java.util.*;
  * Convert bdg-formats AlignmentRecord to GA4GH ReadAlignment.
  */
 @Immutable
-final class BdgenomicsAlignmentRecordToGa4ghReadAlignment extends AbstractConverter<org.bdgenomics.formats.avro.AlignmentRecord, ga4gh.Reads.ReadAlignment> {
+final class BdgenomicsAlignmentRecordToGa4ghReadAlignment extends AbstractConverter<AlignmentRecord, Reads.ReadAlignment> {
 
     /**
      * Convert bdg-format AlignmentRecord to GA4GH ReadAlignment.
      */
-    BdgenomicsAlignmentRecordToGa4ghReadAlignment() { super(org.bdgenomics.formats.avro.AlignmentRecord.class, ga4gh.Reads.ReadAlignment.class); }
+    BdgenomicsAlignmentRecordToGa4ghReadAlignment() { super(AlignmentRecord.class, Reads.ReadAlignment.class); }
 
     private List<ga4gh.Reads.CigarUnit> convertCigar(String cigarString) {
         if (cigarString == null) {
@@ -82,12 +82,13 @@ final class BdgenomicsAlignmentRecordToGa4ghReadAlignment extends AbstractConver
     }
 
     @Override
-    public ga4gh.Reads.ReadAlignment convert(final org.bdgenomics.formats.avro.AlignmentRecord alignmentRecord,
-                                             final ConversionStringency stringency,
-                                             final Logger logger) throws ClassCastException {
+    public ga4gh.Reads.ReadAlignment convert(final AlignmentRecord alignmentRecord,
+                                       final ConversionStringency stringency,
+                                       final Logger logger) throws ClassCastException {
 
         ga4gh.Reads.ReadAlignment.Builder builder  = ga4gh.Reads.ReadAlignment.newBuilder();
         String rgName = alignmentRecord.getRecordGroupName();
+
 
         if(!rgName.isEmpty()) {
             builder.setReadGroupId(rgName);
@@ -103,7 +104,7 @@ final class BdgenomicsAlignmentRecordToGa4ghReadAlignment extends AbstractConver
         builder.setFailedVendorQualityChecks(alignmentRecord.getFailedVendorQualityChecks());
         builder.setSecondaryAlignment(alignmentRecord.getSecondaryAlignment());
         builder.setSupplementaryAlignment(alignmentRecord.getSupplementaryAlignment());
-
+        // /*
         if (alignmentRecord.getMateContigName() != null) {
 
             Common.Strand strand;
@@ -127,8 +128,14 @@ final class BdgenomicsAlignmentRecordToGa4ghReadAlignment extends AbstractConver
             builder.setNumberReads(1);
 
         builder.setReadNumber(alignmentRecord.getReadInFragment());
-        builder.setFragmentLength(alignmentRecord.getInferredInsertSize().intValue());
+
+
+        if(alignmentRecord.getInferredInsertSize() != null) {
+            builder.setFragmentLength(alignmentRecord.getInferredInsertSize().intValue());
+        }
+
         builder.setAlignedSequence(alignmentRecord.getSequence());
+
 
         List<Integer> quallist = new ArrayList<>();
         for( char c : alignmentRecord.getQual().toCharArray()) {
@@ -166,7 +173,6 @@ final class BdgenomicsAlignmentRecordToGa4ghReadAlignment extends AbstractConver
             builder.setAlignment(laBuilder.build());
 
         }
-
 
         return builder.build();
 
