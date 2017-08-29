@@ -17,26 +17,22 @@
  */
 package org.bdgenomics.convert.ga4gh;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertNotNull;
-
 import ga4gh.Common;
-import org.bdgenomics.formats.avro.AlignmentRecord;
-import org.junit.Before;
-import org.junit.Test;
-
-import org.bdgenomics.convert.Converter;
-import org.bdgenomics.convert.ConversionException;
-import org.bdgenomics.convert.ConversionStringency;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import org.bdgenomics.convert.ConversionException;
+import org.bdgenomics.convert.ConversionStringency;
+import org.bdgenomics.convert.Converter;
+import org.bdgenomics.formats.avro.AlignmentRecord;
+import org.junit.Before;
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 /**
  * Unit test for BdgenomicsStrandToGa4ghStrand.
@@ -96,12 +92,7 @@ public final class BdgenomicsAlignmentRecordToGa4ghReadAlignmentTest {
     @Test
     public void testConvert() {
         org.bdgenomics.formats.avro.AlignmentRecord adamRead = makeRead(10L, "10M", "10", 10,0,false).build();
-
-        System.out.println("Here is adamRead: " + adamRead.toString());
-        System.out.println("Here is alignmentConverter: " + alignmentConverter.toString() + " conversion: " + ConversionStringency.STRICT.toString() + " logger: " + logger.toString());
-
         ga4gh.Reads.ReadAlignment gaRead = alignmentConverter.convert(adamRead, ConversionStringency.STRICT, logger);
-
         assertEquals(10L, gaRead.getAlignment().getPosition().getPosition());
         assertEquals( "myCtg", gaRead.getAlignment().getPosition().getReferenceName());
         assertEquals(Common.Strand.POS_STRAND, gaRead.getAlignment().getPosition().getStrand());
@@ -116,24 +107,16 @@ public final class BdgenomicsAlignmentRecordToGa4ghReadAlignmentTest {
         assertEquals(2, gaRead.getNumberReads());
         assertEquals(200L, gaRead.getFragmentLength());
         assertEquals("AAAAAAAAAA", gaRead.getAlignedSequence());
-
         List<Integer> temp = new ArrayList<Integer>(Arrays.asList(9, 9, 9, 9, 9, 9, 9, 9, 9, 9));
         assertEquals(temp, gaRead.getAlignedQualityList());
-
     }
 
     @Test
     public void testJSON() {
         org.bdgenomics.formats.avro.AlignmentRecord adamRead = makeRead(10L, "10M", "10", 10,0,false).build();
-
-        System.out.println("Here is adamRead: " + adamRead.toString());
-        System.out.println("Here is alignmentConverter: " + alignmentConverter.toString() + " conversion: " + ConversionStringency.STRICT.toString() + " logger: " + logger.toString());
-
         ga4gh.Reads.ReadAlignment gaRead = alignmentConverter.convert(adamRead, ConversionStringency.STRICT, logger);
-
         List<ga4gh.Reads.ReadAlignment> gaReads = new ArrayList<ga4gh.Reads.ReadAlignment>();
         gaReads.add(gaRead);
-
         ga4gh.ReadServiceOuterClass.SearchReadsResponse response = ga4gh.ReadServiceOuterClass.SearchReadsResponse.newBuilder().addAllAlignments(gaReads).build();
 
         try {
