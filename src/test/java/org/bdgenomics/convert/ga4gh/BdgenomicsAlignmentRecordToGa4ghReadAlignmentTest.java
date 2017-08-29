@@ -17,22 +17,28 @@
  */
 package org.bdgenomics.convert.ga4gh;
 
-import ga4gh.Common;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+
+import ga4gh.Common;
+
 import org.bdgenomics.convert.ConversionException;
 import org.bdgenomics.convert.ConversionStringency;
 import org.bdgenomics.convert.Converter;
+
 import org.bdgenomics.formats.avro.AlignmentRecord;
+
 import org.junit.Before;
 import org.junit.Test;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 
 /**
  * Unit test for BdgenomicsStrandToGa4ghStrand.
@@ -50,7 +56,6 @@ public final class BdgenomicsAlignmentRecordToGa4ghReadAlignmentTest {
     public void testConstructor() {
         assertNotNull(alignmentConverter);
     }
-
 
     AlignmentRecord.Builder makeRead(Long start, String cigar, String mdtag, int length, int id, Boolean nullQuality) {
        String sequence =  String.join("", Collections.nCopies(length,"A"));
@@ -80,18 +85,15 @@ public final class BdgenomicsAlignmentRecordToGa4ghReadAlignmentTest {
                 .setReadPaired(true)
                 .setInferredInsertSize(200L);
 
-
         if (!nullQuality) {
             builder.setQual(qual);
         }
-
         return builder;
     }
 
-
     @Test
     public void testConvert() {
-        org.bdgenomics.formats.avro.AlignmentRecord adamRead = makeRead(10L, "10M", "10", 10,0,false).build();
+        org.bdgenomics.formats.avro.AlignmentRecord adamRead = makeRead(10L, "10M", "10", 10, 0, false).build();
         ga4gh.Reads.ReadAlignment gaRead = alignmentConverter.convert(adamRead, ConversionStringency.STRICT, logger);
         assertEquals(10L, gaRead.getAlignment().getPosition().getPosition());
         assertEquals( "myCtg", gaRead.getAlignment().getPosition().getReferenceName());
@@ -112,31 +114,14 @@ public final class BdgenomicsAlignmentRecordToGa4ghReadAlignmentTest {
     }
 
     @Test
-    public void testJSON() {
-        org.bdgenomics.formats.avro.AlignmentRecord adamRead = makeRead(10L, "10M", "10", 10,0,false).build();
+    public void testJSON() throws Exception {
+        org.bdgenomics.formats.avro.AlignmentRecord adamRead = makeRead(10L, "10M", "10", 10, 0, false).build();
         ga4gh.Reads.ReadAlignment gaRead = alignmentConverter.convert(adamRead, ConversionStringency.STRICT, logger);
         List<ga4gh.Reads.ReadAlignment> gaReads = new ArrayList<ga4gh.Reads.ReadAlignment>();
         gaReads.add(gaRead);
         ga4gh.ReadServiceOuterClass.SearchReadsResponse response = ga4gh.ReadServiceOuterClass.SearchReadsResponse.newBuilder().addAllAlignments(gaReads).build();
 
-        try {
-            String json = com.google.protobuf.util.JsonFormat.printer().print(response).replaceAll("\\s+","");
-            assertEquals("{\"alignments\":[{\"readGroupId\":\"rg1\",\"fragmentName\":\"read0\",\"numberReads\":2,\"fragmentLength\":200,\"alignment\":{\"position\":{\"referenceName\":\"myCtg\",\"position\":\"10\",\"strand\":\"POS_STRAND\"},\"mappingQuality\":60,\"cigar\":[{\"operation\":\"ALIGNMENT_MATCH\",\"operationLength\":\"10\"}]},\"alignedSequence\":\"AAAAAAAAAA\",\"alignedQuality\":[9,9,9,9,9,9,9,9,9,9],\"nextMatePosition\":{\"referenceName\":\"myCtg\",\"position\":\"100\",\"strand\":\"POS_STRAND\"}}]}", json);
-        } catch(com.google.protobuf.InvalidProtocolBufferException e) {
-            System.err.println("Error throws com.google.protobuf.InvalidProtocolBufferException");
-        }
-
+        String json = com.google.protobuf.util.JsonFormat.printer().print(response).replaceAll("\\s+","");
+        assertEquals("{\"alignments\":[{\"readGroupId\":\"rg1\",\"fragmentName\":\"read0\",\"numberReads\":2,\"fragmentLength\":200,\"alignment\":{\"position\":{\"referenceName\":\"myCtg\",\"position\":\"10\",\"strand\":\"POS_STRAND\"},\"mappingQuality\":60,\"cigar\":[{\"operation\":\"ALIGNMENT_MATCH\",\"operationLength\":\"10\"}]},\"alignedSequence\":\"AAAAAAAAAA\",\"alignedQuality\":[9,9,9,9,9,9,9,9,9,9],\"nextMatePosition\":{\"referenceName\":\"myCtg\",\"position\":\"100\",\"strand\":\"POS_STRAND\"}}]}", json);
     }
-
-
-
 }
-
-
-
-
-
-
-
-
-
