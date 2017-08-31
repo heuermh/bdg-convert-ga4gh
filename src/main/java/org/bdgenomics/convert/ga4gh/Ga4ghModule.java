@@ -21,11 +21,20 @@ import java.util.List;
 
 import javax.annotation.concurrent.Immutable;
 
+import ga4gh.Reads.CigarUnit;
+import ga4gh.Reads.CigarUnit.Operation;
+import ga4gh.Reads.ReadAlignment;
+
+import htsjdk.samtools.Cigar;
+import htsjdk.samtools.CigarOperator;
+
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
 
 import org.bdgenomics.convert.Converter;
+
+import org.bdgenomics.formats.avro.AlignmentRecord;
 
 /**
  * Guice module for the org.bdgenomics.convert.ga4gh package.
@@ -38,8 +47,18 @@ public final class Ga4ghModule extends AbstractModule {
     }
 
     @Provides @Singleton
-    Converter<org.bdgenomics.formats.avro.AlignmentRecord, ga4gh.Reads.ReadAlignment> createBdgenomicsAlignmentRecordToGa4ghReadAlignment() {
-        return new BdgenomicsAlignmentRecordToGa4ghReadAlignment();
+    Converter<CigarOperator, Operation> createCigarOperatorToOperation() {
+        return new CigarOperatorToOperation();
+    }
+
+    @Provides @Singleton
+    Converter<Cigar, List<CigarUnit>> createCigarToCigarUnits(final Converter<CigarOperator, Operation> operatorConverter) {
+        return new CigarToCigarUnits(operatorConverter);
+    }
+
+    @Provides @Singleton
+    Converter<AlignmentRecord, ReadAlignment> createAlignmentRecordToReadAlignment(Converter<Cigar, List<CigarUnit>> cigarConverter) {
+        return new AlignmentRecordToReadAlignment(cigarConverter);
     }
 
     @Provides @Singleton
