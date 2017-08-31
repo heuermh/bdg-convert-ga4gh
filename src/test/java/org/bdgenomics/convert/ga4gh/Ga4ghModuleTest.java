@@ -26,6 +26,13 @@ import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Guice;
 
+import ga4gh.Reads.CigarUnit;
+import ga4gh.Reads.CigarUnit.Operation;
+import ga4gh.Reads.ReadAlignment;
+
+import htsjdk.samtools.Cigar;
+import htsjdk.samtools.CigarOperator;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -33,6 +40,8 @@ import org.bdgenomics.convert.Converter;
 import org.bdgenomics.convert.ConversionStringency;
 
 import org.bdgenomics.convert.bdgenomics.BdgenomicsModule;
+
+import org.bdgenomics.formats.avro.AlignmentRecord;
 
 /**
  * Unit test for Ga4ghModule.
@@ -60,7 +69,9 @@ public final class Ga4ghModuleTest {
         assertNotNull(target.getGa4ghOntologyTermToBdgenomicsOntologyTerm());
         assertNotNull(target.getBdgenomicsStrandToGa4ghStrand());
         assertNotNull(target.getGa4ghStrandToBdgenomicsStrand());
-        assertNotNull(target.getBdgenomicsAlignmentRecordToGa4ghReadAlignment());
+        assertNotNull(target.getCigarOperatorToOperation());
+        assertNotNull(target.getCigarToCigarUnits());
+        assertNotNull(target.getAlignmentRecordToReadAlignment());
     }
 
     /**
@@ -73,7 +84,9 @@ public final class Ga4ghModuleTest {
         Converter<org.bdgenomics.formats.avro.Strand, ga4gh.Common.Strand> bdgenomicsStrandToGa4ghStrand;
         Converter<String, ga4gh.Common.OntologyTerm> featureTypeToOntologyTerm;
         Converter<ga4gh.Common.Strand, org.bdgenomics.formats.avro.Strand> ga4ghStrandToBdgenomicsStrand;
-        Converter<org.bdgenomics.formats.avro.AlignmentRecord, ga4gh.Reads.ReadAlignment> bdgenomicsAlignmentRecordToGa4ghReadAlignment;
+        Converter<CigarOperator, Operation> cigarOperatorToOperation;
+        Converter<Cigar, List<CigarUnit>> cigarToCigarUnits;
+        Converter<AlignmentRecord, ReadAlignment> alignmentRecordToReadAlignment;
 
         @Inject
         Target(final Converter<org.bdgenomics.formats.avro.Feature, ga4gh.SequenceAnnotations.Feature> bdgenomicsFeatureToGa4ghFeature,
@@ -82,14 +95,19 @@ public final class Ga4ghModuleTest {
                final Converter<ga4gh.Common.OntologyTerm, org.bdgenomics.formats.avro.OntologyTerm> ga4ghOntologyTermToBdgenomicsOntologyTerm,
                final Converter<org.bdgenomics.formats.avro.Strand, ga4gh.Common.Strand> bdgenomicsStrandToGa4ghStrand,
                final Converter<ga4gh.Common.Strand, org.bdgenomics.formats.avro.Strand> ga4ghStrandToBdgenomicsStrand,
-               final Converter<org.bdgenomics.formats.avro.AlignmentRecord, ga4gh.Reads.ReadAlignment>bdgenomicsAlignmentRecordToGa4ghReadAlignment) {
+               final Converter<CigarOperator, Operation> cigarOperatorToOperation,
+               final Converter<Cigar, List<CigarUnit>> cigarToCigarUnits,
+               final Converter<AlignmentRecord, ReadAlignment> alignmentRecordToReadAlignment) {
+
             this.bdgenomicsFeatureToGa4ghFeature = bdgenomicsFeatureToGa4ghFeature;
             this.bdgenomicsOntologyTermToGa4ghOntologyTerm = bdgenomicsOntologyTermToGa4ghOntologyTerm;
             this.featureTypeToOntologyTerm = featureTypeToOntologyTerm;
             this.ga4ghOntologyTermToBdgenomicsOntologyTerm = ga4ghOntologyTermToBdgenomicsOntologyTerm;
             this.bdgenomicsStrandToGa4ghStrand = bdgenomicsStrandToGa4ghStrand;
             this.ga4ghStrandToBdgenomicsStrand = ga4ghStrandToBdgenomicsStrand;
-            this.bdgenomicsAlignmentRecordToGa4ghReadAlignment = bdgenomicsAlignmentRecordToGa4ghReadAlignment;
+            this.cigarOperatorToOperation = cigarOperatorToOperation;
+            this.cigarToCigarUnits = cigarToCigarUnits;
+            this.alignmentRecordToReadAlignment = alignmentRecordToReadAlignment;
         }
 
         Converter<org.bdgenomics.formats.avro.Feature, ga4gh.SequenceAnnotations.Feature> getBdgenomicsFeatureToGa4ghFeature() {
@@ -116,9 +134,18 @@ public final class Ga4ghModuleTest {
             return ga4ghStrandToBdgenomicsStrand;
         }
 
-        Converter<org.bdgenomics.formats.avro.AlignmentRecord, ga4gh.Reads.ReadAlignment> getBdgenomicsAlignmentRecordToGa4ghReadAlignment() {
-            return bdgenomicsAlignmentRecordToGa4ghReadAlignment;
+        Converter<CigarOperator, Operation> getCigarOperatorToOperation() {
+            return cigarOperatorToOperation;
         }
+
+        Converter<Cigar, List<CigarUnit>> getCigarToCigarUnits() {
+            return cigarToCigarUnits;
+        }
+
+        Converter<AlignmentRecord, ReadAlignment> getAlignmentRecordToReadAlignment() {
+            return alignmentRecordToReadAlignment;
+        }
+
     }
 
     /**

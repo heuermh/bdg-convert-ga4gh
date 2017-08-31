@@ -19,6 +19,7 @@
   <properties>
     <java.version>1.8</java.version>
     <bdg-formats.version>0.11.1</bdg-formats.version>
+    <commons-lang3.version>3.6</commons-lang3.version>
     <convert.version>0.2-SNAPSHOT</convert.version>
     <ga4gh.version>0.6.0a10</ga4gh.version>
     <guice.version>4.1.0</guice.version>
@@ -176,6 +177,11 @@
         <version>${protobuf.version}</version>
       </dependency>
       <dependency>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-lang3</artifactId>
+        <version>${commons-lang3.version}</version>
+      </dependency>
+      <dependency>
         <groupId>org.ga4gh</groupId>
         <artifactId>ga4gh-schemas</artifactId>
         <version>${ga4gh.version}</version>
@@ -231,6 +237,11 @@
     <dependency>
       <groupId>com.google.protobuf</groupId>
       <artifactId>protobuf-java-util</artifactId>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
       <scope>compile</scope>
     </dependency>
     <dependency>
