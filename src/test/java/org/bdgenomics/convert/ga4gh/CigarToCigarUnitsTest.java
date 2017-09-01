@@ -20,6 +20,7 @@ package org.bdgenomics.convert.ga4gh;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 import java.util.List;
@@ -78,6 +79,14 @@ public final class CigarToCigarUnitsTest {
     @Test
     public void testConvertNullSilent() {
         assertNull(cigarConverter.convert(null, ConversionStringency.SILENT, logger));
+    }
+
+    @Test
+    public void testEmpty() {
+        Cigar empty = new Cigar();
+        List<CigarUnit> cigarUnits = cigarConverter.convert(empty, ConversionStringency.STRICT, logger);
+        assertNotNull(cigarUnits);
+        assertTrue(cigarUnits.isEmpty());
     }
 
     @Test

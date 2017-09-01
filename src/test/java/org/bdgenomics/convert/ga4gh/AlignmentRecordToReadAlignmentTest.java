@@ -20,6 +20,7 @@ package org.bdgenomics.convert.ga4gh;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -60,7 +61,7 @@ public final class AlignmentRecordToReadAlignmentTest {
     private Converter<Cigar, List<CigarUnit>> cigarConverter;
     private Converter<AlignmentRecord, ReadAlignment> alignmentConverter;
 
-    private AlignmentRecord alignment;
+    private AlignmentRecord.Builder alignmentBuilder;
 
     @Before
     public void setUp() {
@@ -68,7 +69,7 @@ public final class AlignmentRecordToReadAlignmentTest {
         cigarConverter = new CigarToCigarUnits(operatorConverter);
         alignmentConverter = new AlignmentRecordToReadAlignment(cigarConverter);
 
-        alignment = AlignmentRecord.newBuilder()
+        alignmentBuilder = AlignmentRecord.newBuilder()
             .setReadName("read0")
             .setStart(10L)
             .setReadMapped(true)
@@ -92,8 +93,7 @@ public final class AlignmentRecordToReadAlignmentTest {
             .setMateAlignmentStart(100L)
             .setMateMapped(true)
             .setReadPaired(true)
-            .setInferredInsertSize(200L)
-            .build();
+            .setInferredInsertSize(200L);
     }
 
     @Test
@@ -123,6 +123,7 @@ public final class AlignmentRecordToReadAlignmentTest {
 
     @Test
     public void testConvert() {
+        AlignmentRecord alignment = alignmentBuilder.build();
         ReadAlignment readAlignment = alignmentConverter.convert(alignment, ConversionStringency.STRICT, logger);
         assertEquals(10L, readAlignment.getAlignment().getPosition().getPosition());
         assertEquals( "myCtg", readAlignment.getAlignment().getPosition().getReferenceName());
@@ -142,7 +143,103 @@ public final class AlignmentRecordToReadAlignmentTest {
     }
 
     @Test
+    public void testConvertImproperPlacement() {
+        AlignmentRecord improperPlacement = alignmentBuilder.setProperPair(false).build();
+        ReadAlignment readAlignment = alignmentConverter.convert(improperPlacement, ConversionStringency.STRICT, logger);
+        assertTrue(readAlignment.getImproperPlacement());
+    }
+
+    @Test
+    public void testConvertUnpairedRead() {
+        AlignmentRecord unpairedRead = alignmentBuilder
+            .setReadPaired(false)
+            .clearMateContigName()
+            .clearMateAlignmentStart()
+            .setMateMapped(false)
+            .build();
+        ReadAlignment readAlignment = alignmentConverter.convert(unpairedRead, ConversionStringency.STRICT, logger);
+        assertEquals(1, readAlignment.getNumberReads());
+        // unexpected, position is not null, and reference name is empty
+        assertEquals("", readAlignment.getNextMatePosition().getReferenceName());
+    }
+
+    @Test
+    public void testConvertUnalignedRead() {
+        AlignmentRecord unalignedRead = alignmentBuilder
+            .setReadMapped(false)
+            .clearContigName()
+            .clearStart()
+            .clearCigar()
+            .build();
+        ReadAlignment readAlignment = alignmentConverter.convert(unalignedRead, ConversionStringency.STRICT, logger);
+        assertEquals(0, readAlignment.getAlignment().getCigarCount());
+        // unexpected, alignment and position are not null, and reference name is empty
+        assertEquals("", readAlignment.getAlignment().getPosition().getReferenceName());
+    }
+
+    @Test
+    public void testConvertMissingRecordGroup() {
+        AlignmentRecord missingRecordGroup = alignmentBuilder.clearRecordGroupName().build();
+        ReadAlignment readAlignment = alignmentConverter.convert(missingRecordGroup, ConversionStringency.STRICT, logger);
+        assertEquals("1", readAlignment.getReadGroupId());
+    }
+
+    @Test
+    public void testConvertNullInferredInsertSize() {
+        AlignmentRecord nullInferredInsertSize = alignmentBuilder.clearInferredInsertSize().build();
+        ReadAlignment readAlignment = alignmentConverter.convert(nullInferredInsertSize, ConversionStringency.STRICT, logger);
+        assertEquals(0, readAlignment.getFragmentLength());
+    }
+
+    @Test
+    public void testConvertMateNegativeStrand() {
+        AlignmentRecord mateNegativeStrand = alignmentBuilder.setMateNegativeStrand(true).build();
+        ReadAlignment readAlignment = alignmentConverter.convert(mateNegativeStrand, ConversionStringency.STRICT, logger);
+        assertEquals(Strand.NEG_STRAND, readAlignment.getNextMatePosition().getStrand());
+    }
+
+    @Test
+    public void testConvertEmptyQual() {
+        AlignmentRecord emptyQual = alignmentBuilder.clearQual().build();
+        ReadAlignment readAlignment = alignmentConverter.convert(emptyQual, ConversionStringency.STRICT, logger);
+        assertNotNull(readAlignment.getAlignedQualityList());
+        assertTrue(readAlignment.getAlignedQualityList().isEmpty());
+    }
+
+    @Test
+    public void testConvertMappedNegativeStrand() {
+        AlignmentRecord mappedNegativeStrand = alignmentBuilder.setReadNegativeStrand(true).build();
+        ReadAlignment readAlignment = alignmentConverter.convert(mappedNegativeStrand, ConversionStringency.STRICT, logger);
+        assertEquals(Strand.NEG_STRAND, readAlignment.getAlignment().getPosition().getStrand());
+    }
+
+    @Test(expected=ConversionException.class)
+    public void testConvertIllegalCigarStrict() {
+        AlignmentRecord illegalCigar = alignmentBuilder.setCigar("10").build();
+        alignmentConverter.convert(illegalCigar, ConversionStringency.STRICT, logger);
+    }
+
+    @Test
+    public void testConvertIllegalCigarLenient() {
+        AlignmentRecord illegalCigar = alignmentBuilder.setCigar("10").build();
+        ReadAlignment readAlignment = alignmentConverter.convert(illegalCigar, ConversionStringency.LENIENT, logger);
+        assertEquals(0, readAlignment.getAlignment().getCigarCount());
+        assertNotNull(readAlignment.getAlignment().getCigarList());
+        assertTrue(readAlignment.getAlignment().getCigarList().isEmpty());
+    }
+
+    @Test
+    public void testConvertIllegalCigarSilent() {
+        AlignmentRecord illegalCigar = alignmentBuilder.setCigar("10").build();
+        ReadAlignment readAlignment = alignmentConverter.convert(illegalCigar, ConversionStringency.SILENT, logger);
+        assertEquals(0, readAlignment.getAlignment().getCigarCount());
+        assertNotNull(readAlignment.getAlignment().getCigarList());
+        assertTrue(readAlignment.getAlignment().getCigarList().isEmpty());
+    }
+
+    @Test
     public void testJson() throws Exception {
+        AlignmentRecord alignment = alignmentBuilder.build();
         ReadAlignment readAlignment = alignmentConverter.convert(alignment, ConversionStringency.STRICT, logger);
 
         SearchReadsResponse response = SearchReadsResponse.newBuilder()
