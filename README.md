@@ -1,5 +1,11 @@
 # bdg-convert-ga4gh
 
+---
+NOTE:  Migrated to  https://github.com/bigdatagenomics/bdg-convert repository in  https://github.com/bigdatagenomics/bdg-convert/pull/29.
+
+This project will no longer be updated.
+---
+
 ### Hacking bdg-convert-ga4gh
 
 Install
